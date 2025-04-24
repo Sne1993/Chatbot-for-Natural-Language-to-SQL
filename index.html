@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QueryGenie</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #f1f8e9);
+      margin: 0;
+      padding: 10px;
+    }
+
+    .chat-container {
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    .chat-box {
+      height: 250px;
+      overflow-y: auto;
+      border: 1px solid #c8e6c9;
+      border-radius: 6px;
+      padding: 10px;
+      background-color: #f1f8e9;
+      color: #37474f;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .input-container button {
+      padding: 8px 14px;
+      background-color: #43a047;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .input-container button:hover {
+      background-color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <h2>QueryGenie: SQL Assistant</h2>
+  <div class="chat-box" id="chat-box"></div>
+  <div class="input-container">
+    <input type="text" id="user-input" placeholder="Ask for an SQL query..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  function sendMessage() {
+    const userInput = document.getElementById("user-input").value;
+    if (userInput.trim() === "") return;
+
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += "<div><b>You:</b> " + userInput + "</div>";
+
+    fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: userInput })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const sqlQuery = data.response;
+      chatBox.innerHTML += "<div><b>QueryGenie:</b> " + sqlQuery + "</div>";
+      chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      chatBox.innerHTML += "<div><b>QueryGenie:</b> Sorry, there was an error processing your request.</div>";
+    });
+
+    document.getElementById("user-input").value = "";
+  }
+</script>
+
+</body>
+</html>
